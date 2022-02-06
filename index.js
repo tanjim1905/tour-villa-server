@@ -1,5 +1,6 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 require('dotenv').config();
 const cors = require('cors');
 const app = express();
@@ -22,7 +23,8 @@ async function run() {
     const database = client.db("tourVillaDb");
     const servicesCollecntion = database.collection("services");
     const destinationCollecntion = database.collection("destination");
-    const blogCollecntion = database.collection("blog");
+    const blogsCollecntion = database.collection("blogs");
+    const allOrdersCollecntion = database.collection("allOrders");
     
     // SERVICES POST API
     app.post('/services', async (req, res) => {
@@ -34,8 +36,16 @@ async function run() {
     })
 
     // SERVICES GET API
-    app.get('/destination', async (req, res) => {
+    app.get('/services', async (req, res) => {
       const result = await servicesCollecntion.find({}).toArray();
+      res.json(result);
+    })
+
+    // SINGLE SERVICES GET API
+    app.get('/services/details/:detailsId', async (req, res) => {
+      const id = req.params.detailsId;
+      const query = {_id: ObjectId(id)};
+      const result = await servicesCollecntion.findOne(query);
       res.json(result);
     })
 
@@ -49,23 +59,46 @@ async function run() {
     })
 
     // DESTINATION GET API
-    app.get('/services', async (req, res) => {
+    app.get('/destination', async (req, res) => {
       const result = await servicesCollecntion.find({}).toArray();
       res.json(result);
     })
 
     // BLOG POST API
-    app.post('/destination', async (req, res) => {
+    app.post('/blogs', async (req, res) => {
       const blog = req.body;
-      const result = await blogCollecntion.insertOne(blog);
+      const result = await blogsCollecntion.insertOne(blog);
       res.json(result);
       console.log(blog);
       console.log(result);
     })
 
     // BLOG GET API
-    app.get('/blog', async (req, res) => {
-      const result = await blogCollecntion.find({}).toArray();
+    app.get('/blogs', async (req, res) => {
+      const result = await blogsCollecntion.find({}).toArray();
+      res.json(result);
+    })
+
+    // SINGLE BLOG GET API
+    app.get('/blog/details/:blogId', async (req, res) => {
+      const id = req.params.blogId;
+      const query = {_id: ObjectId(id)};
+      const result = await blogsCollecntion.findOne(query);
+      res.json(result);
+    })
+
+    // All Orders POST API
+    app.post('/allorders', async (req, res) => {
+      const allorders = req.body;
+      const result = await allOrdersCollecntion.insertOne(allorders);
+      res.json(result);
+      console.log(allorders);
+      console.log(result);
+    })
+
+    // BLOG GET API
+    app.get('/allorders', async (req, res) => {
+      const result = await allOrdersCollecntion.find({}).toArray();
       res.json(result);
     })
   } finally {
